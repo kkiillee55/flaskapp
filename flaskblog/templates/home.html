@@ -8,17 +8,48 @@
     {% endif %}
 {% endblock head_content %}
 
+{%block page_header_content%}
+    <header class="masthead" style="background-image: url({{url_for('static',filename='img/home-bg.jpg')}})">
+    <div class="overlay"></div>
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-md-10 mx-auto">
+                    <div class="post-heading">
+                        <h1>Some page Header content in 'home.html'</h1>
+                        <h2 class="subheading">Subheading content in 'home.html'</h2>
+                        <span class="meta">Posted by<a href="#">Ambrose</a>Some day, some day~~</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+{%endblock page_header_content%}
+
+
+
+
 {% block body_content %}
     {% for post in posts.items %}
         <article class="media content-section">
             <img class="rounded-circle article-img" src="{{ url_for('static',filename='profile_pics/'+post.author.image_file) }}">
-            <div class="media-body">
-                <div class="article-metadata">
-                    <a class="mr-2" href="{{ url_for('user_posts',username=post.author.username) }}">{{ post.author.username }}</a>
-                    <small class="text-muted">{{ post.date_posted.strftime('%Y-%m-%d') }}</small>
-                </div>
-                <h2><a class="article-title" href="{{ url_for('post',post_id=post.id) }}">{{ post.title }}</a></h2>
-                <p class="article-content">{{ post.content[:20] }}...</p>
+<!--            <div class="media-body">-->
+<!--                <div class="article-metadata">-->
+<!--                    <a class="mr-2" href="{{ url_for('user_posts',username=post.author.username) }}">{{ post.author.username }}</a>-->
+<!--                    <small class="text-muted">{{ post.date_posted.strftime('%Y-%m-%d') }}</small>-->
+<!--                </div>-->
+<!--                <h2><a class="article-title" href="{{ url_for('post',post_id=post.id) }}">{{ post.title }}</a></h2>-->
+<!--                <p class="article-content">{{ post.content[:20] }}...</p>-->
+<!--            </div>-->
+            <div class="post-preview">
+                <a href="{{ url_for('post',post_id=post.id) }}">
+                    <h2 class="post-title">
+                        {{ post.title }}
+                    </h2>
+                    <h3 class="post-subtitle">
+                        {{ post.content[:20] }}
+                    </h3>
+                </a>
+                <p class="post-meta">Posted by    <a href="{{ url_for('user_posts',username=post.author.username) }}">{{post.author.username}}</a>    on {{ post.date_posted.strftime('%Y-%m-%d') }}</p>
             </div>
         </article>
     {% endfor %}

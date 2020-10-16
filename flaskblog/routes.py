@@ -249,7 +249,3 @@ def reset_token(token):
 @app.route('/resume')
 def resume():
     return render_template('resume.html',title='Resume')
-
-@app.route('/new_home')
-def new_home():
-    return render_template('new_layout.html',title='NewHome')

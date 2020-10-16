@@ -17,25 +17,32 @@
     </style>
 {% endblock head_content %}
 
-{% block body_content %}
-    <article class="media content-section">
-        <img class="rounded-circle article-img" src="{{ url_for('static',filename='profile_pics/'+post.author.image_file) }}">
-        <div class="media-body">
-            <div class="article-metadata">
-                <a class="mr-2" href="{{ url_for('user_posts',username=post.author.username) }}">{{ post.author.username }}</a>
-                <small class="text-muted">{{ post.date_posted.strftime('%Y-%m-%d') }}</small>
-                {% if post.author==current_user %}
-                    <div>
-                        <a class="btn btn-secondary btn-sm mt-1 mb-1" href="{{ url_for('update_post',post_id=post.id) }}">Update</a>
-                        <button type="button" class="btn btn-danger btn-sm m-1" data-toggle="modal" data-target="#deleteModal">Delete</button>
+{%block page_header_content%}
+    <!--    <header class="masthead" style="background-image: url('img/post-bg.jpg')">-->
+    <header class="masthead" style="background-image: url({{url_for('static',filename='img/post-bg.jpg')}})">
+    <div class="overlay"></div>
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-md-10 mx-auto">
+                    <div class="post-heading">
+                        <h1>{{ post.title }}</h1>
+                        <span class="meta">Posted by    <a href="{{ url_for('user_posts',username=post.author.username) }}">    {{ post.author.username }}</a>    on {{ post.date_posted.strftime('%Y-%m-%d') }}</span>
+                        {% if post.author==current_user %}
+                            <div>
+                                <a class="btn btn-secondary btn-sm mt-1 mb-1" href="{{ url_for('update_post',post_id=post.id) }}">Update</a>
+                                <button type="button" class="btn btn-danger btn-sm m-1" data-toggle="modal" data-target="#deleteModal">Delete</button>
+                            </div>
+                        {% endif %}
                     </div>
-                {% endif %}
+                </div>
             </div>
-            <h2 class="article-title">{{ post.title }}</h2>
-            <p class="article-content">{{ post.content }}</p>
-
         </div>
-    </article>
+    </header>
+{%endblock page_header_content%}
+
+{% block post_content %}
+    <p>{{post.content}}</p>
+
     <a href="{{url_for('comment',post_id=post.id,username=post.author.username)}}">Comment</a>
     {%for comment in post.comments%}
         <div class="chatbox">
@@ -46,6 +53,7 @@
             <span class="text-info"><a href="{{url_for('comment',post_id=post.id,username=comment.author.username)}}">reply</a></span>
         </div>
     {%endfor%}
+
 
 <!-- deleteModal -->
 <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
@@ -67,6 +75,4 @@
   </div>
 </div>
 
-
-
-{% endblock body_content%}
+{% endblock post_content%}
