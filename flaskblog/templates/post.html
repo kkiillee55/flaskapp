@@ -1,0 +1,72 @@
+{% extends "layout.html" %}
+
+{% block head_content %}
+    {% if title %}
+        <title>Flask Blog - {{title}}</title>
+    {% else %}
+        <title>Flask Blog</title>
+    {% endif %}
+    <style>
+        .chatbox {
+          border: 2px solid #dedede;
+          background-color: #f1f1f1;
+          border-radius: 5px;
+          padding: 10px;
+          margin: 10px 0;
+        }
+    </style>
+{% endblock head_content %}
+
+{% block body_content %}
+    <article class="media content-section">
+        <img class="rounded-circle article-img" src="{{ url_for('static',filename='profile_pics/'+post.author.image_file) }}">
+        <div class="media-body">
+            <div class="article-metadata">
+                <a class="mr-2" href="{{ url_for('user_posts',username=post.author.username) }}">{{ post.author.username }}</a>
+                <small class="text-muted">{{ post.date_posted.strftime('%Y-%m-%d') }}</small>
+                {% if post.author==current_user %}
+                    <div>
+                        <a class="btn btn-secondary btn-sm mt-1 mb-1" href="{{ url_for('update_post',post_id=post.id) }}">Update</a>
+                        <button type="button" class="btn btn-danger btn-sm m-1" data-toggle="modal" data-target="#deleteModal">Delete</button>
+                    </div>
+                {% endif %}
+            </div>
+            <h2 class="article-title">{{ post.title }}</h2>
+            <p class="article-content">{{ post.content }}</p>
+
+        </div>
+    </article>
+    <a href="{{url_for('comment',post_id=post.id,username=post.author.username)}}">Comment</a>
+    {%for comment in post.comments%}
+        <div class="chatbox">
+            <img class="rounded-circle article-img"  style="width:40px;height:40px;" src="{{url_for('static',filename='profile_pics/'+comment.author.image_file)}}">
+            <small class="text-info">{{ comment.author.username }}</small>
+            <small class="text-muted">{{ comment.date_commented.strftime('%Y-%m-%d %H:%M') }}</small>
+            <p>To {{comment.replyto}}: {{comment.content}}</p>
+            <span class="text-info"><a href="{{url_for('comment',post_id=post.id,username=comment.author.username)}}">reply</a></span>
+        </div>
+    {%endfor%}
+
+<!-- deleteModal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteModalLabel">Delete Post?</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <form action="{{ url_for('delete_post',post_id=post.id) }}" method="POST">
+            <input class="btn btn-danger" type="submit" value="Delete">
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+{% endblock body_content%}

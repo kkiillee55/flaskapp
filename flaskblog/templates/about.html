@@ -1,0 +1,13 @@
+{% extends "layout.html" %}
+
+{% block head_content %}
+    {% if title %}
+        <title>Flask Blog - {{title}}</title>
+    {% else %}
+        <title>Flask Blog</title>
+    {% endif %}
+{% endblock head_content %}
+
+{% block body_content %}
+    <h1>About page content</h1>
+{% endblock body_content %}
