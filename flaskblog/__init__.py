@@ -6,9 +6,15 @@ from flask_bcrypt import Bcrypt
 from flask_login import LoginManager
 from flask_mail import Mail
 import os
+import json
+
+with open('flaskblog/secrets.json') as fp:
+    secrets=json.load(fp)
+#print(secrets)
+
 app=Flask(__name__)
-app.config['SECRET_KEY']='21e4d270a08ee35c7bac3a3e9f5f29da'
-app.config['SQLALCHEMY_DATABASE_URI']='mysql+pymysql://root:12345678@localhost:3306/flask'
+app.config['SECRET_KEY']=secrets['SECRET_KEY']
+app.config['SQLALCHEMY_DATABASE_URI']=secrets['SQLALCHEMY_DATABASE_URI']
 db=SQLAlchemy(app)
 migrate=Migrate(app,db)
 manager=Manager(app)
@@ -25,8 +31,8 @@ login_manager.login_message_category='info'
 app.config['MAIL_SERVER']='smtp.gmail.com'
 app.config['MAIL_PORT']=587
 app.config['MAIL_USE_TLS']=True
-app.config['MAIL_USERNAME']='zhangliao322@gmail.com'
-app.config['MAIL_PASSWORD']='rtyzkwcwlcmcxoew'
+app.config['MAIL_USERNAME']=secrets['MAIL_USERNAME']
+app.config['MAIL_PASSWORD']=secrets['MAIL_PASSWORD']
 mail=Mail(app)
 
 #because we have @app.route in routes.py,
