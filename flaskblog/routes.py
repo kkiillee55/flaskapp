@@ -245,3 +245,7 @@ def reset_token(token):
         flash(f'password updated {user.username}!','success')
         return redirect(url_for('login'))
     return render_template('reset_token.html',title='Reset Password',form=form)
+
+@app.route('/resume')
+def resume():
+    return render_template('resume.html',title='Resume')
