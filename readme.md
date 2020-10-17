@@ -11,6 +11,7 @@ Then I tried to build the docker image of this web application locally. I write 
 Finally, I put every in AWS. I first create a Postgre db in RDS, and test the connection. Then I started an EC2 instance, git clone this branch, create docker image of this web
 application and push it to ECR, finally, I create a cluster in ECS and run the conatiner image uploaded just now in AWS. and here's a screenshot:
 
+<img src="https://github.com/kkiillee55/flaskapp/blob/add-resume/successful.PNG">
 
 
 
