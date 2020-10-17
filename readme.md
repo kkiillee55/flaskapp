@@ -14,5 +14,16 @@ application and push it to ECR, finally, I create a cluster in ECS and run the c
 <img src="https://github.com/kkiillee55/flaskapp/blob/add-resume/successful.PNG">
 
 
+I come up with another idea when I was taking shower. I want to add an admin page of my website,
+
+so I will have to create another databse tabel admin
+admin account can only be added manually to database
+admin account can do everything that normal account can do
+admin has a special page that would display statistics of the website, like:
+How many posts were created in past 30 days? half years? whole year?
+How many new users where created in past 30 days? ...? , ...? 
+so there should be some cool graphs in admin page, i should check <a href="https://www.highcharts.com/">Highcharts</a>  for plotting graphs, 
+and admin should be able to delete any post, comment and user.
+it shouldn't be very hard, 
 
 
