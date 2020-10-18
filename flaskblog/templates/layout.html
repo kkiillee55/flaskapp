@@ -20,7 +20,7 @@
 
   <!-- Custom styles for this template -->
   <link href="{{url_for('static',filename='css/clean-blog.min.css')}}" rel="stylesheet">
-
+  <link href="{{url_for('static',filename='vendor/datatables/dataTables.bootstrap4.min.css')}}" rel="stylesheet">
   {% block head_content %} {% endblock head_content %}
 
 </head>
@@ -54,6 +54,11 @@
             <li class="nav-item">
               <a class="nav-link" href="{{url_for('logout')}}">Logout</a>
             </li>
+            {%if current_user.role.is_admin%}
+              <li class="nav-item">
+                <a class="nav-link" href="{{url_for('admin')}}">Admin</a>
+              </li>
+            {%endif%}
           {%else%}
             <li class="nav-item">
               <a class="nav-link" href="{{url_for('login')}}">Login</a>
@@ -95,7 +100,7 @@
 
   <hr>
 <!--  post content-->
-    <article>
+  <article>
     <div class="container">
       <div class="row">
         <div class="col-lg-8 col-md-10 mx-auto">
@@ -149,7 +154,6 @@
   <!-- Bootstrap core JavaScript -->
   <script src="{{url_for('static',filename='vendor/jquery/jquery.min.js')}}"></script>
   <script src="{{url_for('static',filename='vendor/bootstrap/js/bootstrap.bundle.min.js')}}"></script>
-
   <!-- Custom scripts for this template -->
   <script src="{{url_for('static',filename='js/clean-blog.min.js')}}"></script>
 

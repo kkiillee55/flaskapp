@@ -28,6 +28,7 @@
         <div class="media-body">
             <h2 class="account-heading">{{ current_user.username }}</h2>
             <p class="text-secondary">{{ current_user.email }}</p>
+            <small class="text-muted">Joined in {{current_user.date_registered.strftime('%Y-%m-%d')}}</small>
         </div>
     </div>
     <!-- FORM HERE -->
@@ -77,13 +78,37 @@
         </fieldset>
         <div class="form-group">
             {{ form.submit(class="btn btn-outline-info") }}
+            <button type="button" class="btn btn-danger btn-sm m-1" data-toggle="modal" data-target="#deleteModal">Delete</button>
         </div>
     </form>
+<!--    <div class="container">-->
+<!--        <button type="button" class="btn btn-danger btn-sm m-1" data-toggle="modal" data-target="#deleteModal">Delete</button>-->
+<!--    </div>-->
+
 <!--    <div class="border-top pt-3">-->
 <!--        <small class="text-muted">-->
 <!--            &lt;!&ndash;url_for('function name') not the decorator name&ndash;&gt;-->
 <!--            Already have an account? <a class="ml-2" href="{{ url_for('login') }}">Log in</a>-->
 <!--        </small>-->
 <!--    </div>-->
+</div>
+
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteModalLabel">Delete Account?</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <form action="{{ url_for('delete_account') }}" method="POST">
+            <input class="btn btn-danger" type="submit" value="Delete">
+        </form>
+      </div>
+    </div>
+  </div>
 </div>
 {% endblock body_content %}
