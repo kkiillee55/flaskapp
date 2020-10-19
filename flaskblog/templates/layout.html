@@ -7,8 +7,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <meta name="description" content="">
   <meta name="author" content="">
+  {% block head_content %} {% endblock head_content %}
 
-  <title>Clean Blog - Start Bootstrap Theme</title>
+  <title>Flask Blog</title>
 
   <!-- Bootstrap core CSS -->
   <link href="{{url_for('static',filename='vendor/bootstrap/css/bootstrap.min.css')}}" rel="stylesheet">
@@ -21,7 +22,7 @@
   <!-- Custom styles for this template -->
   <link href="{{url_for('static',filename='css/clean-blog.min.css')}}" rel="stylesheet">
   <link href="{{url_for('static',filename='vendor/datatables/dataTables.bootstrap4.min.css')}}" rel="stylesheet">
-  {% block head_content %} {% endblock head_content %}
+
 
 </head>
 

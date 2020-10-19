@@ -143,10 +143,6 @@ def admin():
         return redirect(url_for('home'))
     return render_template('/admin/admin.html',title='Admin')
 
-@app.route('/admin')
-@login_required
-def user_chart():
-    pass
 
 @app.route('/user_table')
 @login_required
@@ -160,8 +156,18 @@ def user_table():
     users=db.engine.execute('select * from role,"user" where role.role={} and "user".role_id=role.id'.format(f'\'{role}\''))
     return render_template('/admin/user_table.html',title='Table',users=users)
 
-
-
+@app.route('/user_chart')
+@login_required
+def user_chart():
+    if not current_user.role.is_admin:
+        flash('You don\'t have privilege to view this page', 'warning')
+        return redirect(url_for('home'))
+    role = request.args.get('role', 'normal_user', type=str)
+    user_count=db.engine.execute('select count("user".id) from role,"user" where role.role={} and "user".role_id=role.id'.format(f'\'{role}\''))
+    legend = 'Monthly Data'
+    labels = ["January", "February", "March", "April", "May", "June", "July", "August"]
+    values = [10, 9, 8, 7, 6, 4, 7, 8]
+    return render_template('/admin/user_chart.html',title='Chart',legend=legend,labels=labels,values=values)
 
 @app.route('/post/new',methods=['GET','POST'])
 @login_required
