@@ -27,12 +27,12 @@ function number_format(number, decimals, dec_point, thousands_sep) {
   return s.join(dec);
 }
 
-function LogMyTest(data){
-    console.log(data);
-}
-
-var chartData={
-    labels: "January", "February", "March", "April", "May", "June", "July", "August"],
+// Area Chart Example
+var ctx = document.getElementById("myAreaChart");
+var myLineChart = new Chart(ctx, {
+  type: 'line',
+  data: {
+    labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
     datasets: [{
       label: "Earnings",
       lineTension: 0.3,
@@ -49,11 +49,6 @@ var chartData={
       data: [0, 10000, 5000, 15000, 10000, 20000, 15000, 25000, 20000, 30000, 25000, 40000],
     }],
   },
-// Area Chart Example
-var ctx = document.getElementById("myAreaChart");
-var myLineChart = new Chart(ctx, {
-  type: 'line',
-  data: chartData,
   options: {
     maintainAspectRatio: false,
     layout: {

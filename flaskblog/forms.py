@@ -2,7 +2,7 @@ from flask_wtf import FlaskForm
 from flask_wtf.file import FileField,FileAllowed
 from flask_login import current_user
 from wtforms import StringField,PasswordField,SubmitField,BooleanField,TextAreaField,IntegerField
-from wtforms.validators import DataRequired,Length,Email,EqualTo,ValidationError
+from wtforms.validators import DataRequired,Length,Email,EqualTo,ValidationError,NumberRange
 from flaskblog.models import User
 
 
@@ -90,3 +90,7 @@ class CommentForm(FlaskForm):
     #replyto=StringField('Reply to',validators=[DataRequired()])
     content=StringField('Content',validators=[DataRequired()])
     submit=SubmitField('Submit')
+
+class UserChartDayForm(FlaskForm):
+    day=IntegerField('Past Days',validators=[DataRequired(),NumberRange(min=1,max=1000)])
+    submit=SubmitField('Go')

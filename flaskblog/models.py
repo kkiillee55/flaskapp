@@ -17,7 +17,7 @@ class User(db.Model,UserMixin):
     date_registered=db.Column(db.DateTime,nullable=False,default=datetime.utcnow())
     #here we use 'Post' instead of 'post', because we are referencing Post class below
     posts=db.relationship('Post',backref='author',lazy=True,cascade="all,delete-orphan")
-    comments=db.relationship('Comment',backref='author',lazy=True,cascade="all,delete-orphan")
+    comments=db.relationship('Comment',backref='author',lazy='joined',cascade="all,delete-orphan")
 
     #one user can only have one role
     role_id=db.Column(db.Integer,db.ForeignKey('role.id',ondelete='CASCADE'),nullable=False,default=1)
@@ -67,10 +67,10 @@ class Role(db.Model):
 
     assign_remove_admin=db.Column(db.Boolean,nullable=False,default=False)
 
-    users=db.relationship('User',backref='role',lazy=True,cascade='all,delete')
+    users=db.relationship('User',backref='role',lazy='joined',cascade='all,delete')
 
     def __repr__(self):
-        return f'Role:{self.role}, can_see_statistic_page:{self.can_see_statistic_page}, can_see_admin_page=db.Column:{self.can_see_admin_page}, delete_normal_account:{self.delete_normal_account}, delete_admin_account:{self.delete_admin_account}, delete_post:{self.delete_post}, assign_remove_admin:{self.assign_remove_admin}\n'
+        return f'Role:{self.role}, delete_post:{self.delete_post}, assign_remove_admin:{self.assign_remove_admin}\n'
 
 
 
@@ -84,7 +84,7 @@ class Post(db.Model):
     date_posted=db.Column(db.DateTime,nullable=False,default=datetime.utcnow)
     content=db.Column(db.Text,nullable=False)
 
-    comments=db.relationship('Comment',backref='post',lazy=True,cascade="all,delete-orphan")
+    comments=db.relationship('Comment',backref='post',lazy='joined',cascade="all,delete-orphan")
     #here we use 'user.id' instead of 'User.id', because we are referencing the table name in database,
     #database will convert capital letters to lowercase letters, so we will have user table instead of User table
     #feels a bit inconsistancy...

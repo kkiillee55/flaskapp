@@ -1,12 +1,14 @@
 from flask import url_for,render_template,flash,redirect,request,abort
 from flaskblog import app,bcrypt,db,mail
-from flaskblog.forms import RegistrationForm,LoginForm,UpdateAccountForm,PostForm,RequestResetForm,ResetPasswordForm,PageForm,CommentForm
-from flaskblog.models import User,Post,Comment
+from flaskblog.forms import RegistrationForm,LoginForm,UpdateAccountForm,PostForm,RequestResetForm,ResetPasswordForm,CommentForm,UserChartDayForm
+from flaskblog.models import User,Post,Role,Comment
 from flask_login import login_user,current_user,logout_user,login_required
 from flask_mail import Message
 import secrets
 import os
 from PIL import Image
+from flask_restful import inputs
+from datetime import datetime,timedelta
 # dummyData=[
 #     {
 #         'author':'Corey Shafer',
@@ -141,33 +143,123 @@ def admin():
     if not current_user.role.is_admin:
         flash('You don\'t have privilege to view this page','warning')
         return redirect(url_for('home'))
-    return render_template('/admin/admin.html',title='Admin')
+    area_chart={'title':'New User Joined In past 30 days',
+                'legend':'User joined on this day',
+                'labels':[],
+                'values':[]}
+    earliest_date_registered=User.query.order_by(User.date_registered).first().date_registered
+    curr_day=datetime.utcnow()
+    days_difference=(curr_day-earliest_date_registered).days
+    for i in range(min(30,days_difference+2),0,-1):
+        d1=curr_day-timedelta(days=i)
+        d2=curr_day-timedelta(days=i-1)
+        number_of_user_joined_between_d1_d2=len(User.query.filter(User.date_registered>=d1).filter(User.date_registered<d2).all())
+        area_chart['labels'].append(d1.strftime('%Y/%m/%d'))
+        area_chart['values'].append(number_of_user_joined_between_d1_d2)
 
+    pie_chart={'title':'User Composition',
+               'labels':[role.role for role in Role.query.all()],
+               'values':[len(User.query.filter(User.role_id==role.id).all()) for role in Role.query.all()]}
 
-@app.route('/user_table')
+    return render_template('/admin/dashboard.html',title='Admin',area_chart=area_chart,pie_chart=pie_chart,page_header='Dashboard')
+
+@app.route('/admin/user_table')
 @login_required
 def user_table():
     if not current_user.role.is_admin:
         flash('You don\'t have privilege to view this page','warning')
         return redirect(url_for('home'))
     role = request.args.get('role', 'normal_user', type=str)
-
+    show_post=request.args.get('post',False,type=inputs.boolean)
+    posts=None
+    if show_post:
+        #posts=db.engine.execute('select post.id,post.title,post.date_posted,"user".username from post, role,"user" where role.role={} and "user".role_id=role.id'.format(f'\'{role}\''))
+        posts = Post.query.join(User, Post.user_id == User.id).join(Role, User.role_id == Role.id).filter(Role.role == role).all()
     #still cannot avoid writing sql queries
-    users=db.engine.execute('select * from role,"user" where role.role={} and "user".role_id=role.id'.format(f'\'{role}\''))
-    return render_template('/admin/user_table.html',title='Table',users=users)
+    #users=db.engine.execute('select * from role,"user" where role.role={} and "user".role_id=role.id'.format(f'\'{role}\''))
+    users = User.query.join(Role, User.role_id == Role.id).filter(Role.role == role).all()
+    return render_template('/admin/user_table.html',title='Table',users=users,posts=posts,show_post=show_post)
 
-@app.route('/user_chart')
+@app.route('/user/<int:user_id>/assign',methods=['POST'])
+@login_required
+def assign_admin(user_id):
+    user=User.query.get_or_404(user_id)
+    if user:
+        user.role_id=2
+        db.session.commit()
+        flash(f'{user.username} Promoted!', 'success')
+    else:
+        abort(403)
+    return redirect(url_for('admin'))
+
+@app.route('/user/<int:user_id>/remove',methods=['POST'])
+@login_required
+def remove_admin(user_id):
+    user=User.query.get_or_404(user_id)
+    if user:
+        user.role_id=1
+        db.session.commit()
+        flash(f'{user.username} Demoted!', 'success')
+    else:
+        abort(403)
+    return redirect(url_for('admin'))
+
+@app.route('/admin/user_chart',methods=['GET','POST'])
 @login_required
 def user_chart():
     if not current_user.role.is_admin:
-        flash('You don\'t have privilege to view this page', 'warning')
+        flash('You don\'t have privilege to view this page','warning')
         return redirect(url_for('home'))
-    role = request.args.get('role', 'normal_user', type=str)
-    user_count=db.engine.execute('select count("user".id) from role,"user" where role.role={} and "user".role_id=role.id'.format(f'\'{role}\''))
-    legend = 'Monthly Data'
-    labels = ["January", "February", "March", "April", "May", "June", "July", "August"]
-    values = [10, 9, 8, 7, 6, 4, 7, 8]
-    return render_template('/admin/user_chart.html',title='Chart',legend=legend,labels=labels,values=values)
+    form=UserChartDayForm()
+    if form.validate_on_submit():
+        past_day=form.day.data
+    else:
+        past_day=30
+    earliest_date_registered = User.query.order_by(User.date_registered).first().date_registered
+    curr_day = datetime.utcnow()
+    days_difference = (curr_day - earliest_date_registered).days
+    labels=[]
+    values=[]
+    ymax=0
+    for i in range(min(past_day, days_difference + 2), 0, -1):
+        d1 = curr_day - timedelta(days=i)
+        d2=curr_day-timedelta(days=i-1)
+        post_count=len(Post.query.filter(Post.date_posted>=d1).filter(Post.date_posted<d2).all())
+        comment_count=len(Comment.query.filter(Comment.date_commented>=d1).filter(Comment.date_commented<d2).all())
+        new_user_count=len(User.query.filter(User.date_registered>=d1).filter(User.date_registered<d2).all())
+        active_pts=new_user_count*10+post_count*5+comment_count
+        labels.append(d1.strftime('%Y/%m/%d'))
+        values.append(active_pts)
+        ymax=max(ymax,active_pts)
+    ymax*=1.5
+    return render_template('/admin/user_chart.html',page_header='Charts',labels=labels,values=values,form=form,ymax=ymax,day=past_day)
+
+@app.route('/admin/post_chart',methods=['GET','POST'])
+@login_required
+def post_chart():
+    if not current_user.role.is_admin:
+        flash('You don\'t have privilege to view this page','warning')
+        return redirect(url_for('home'))
+    form=UserChartDayForm()
+    if form.validate_on_submit():
+        past_day=form.day.data
+    else:
+        past_day=30
+    earliest_date_registered = User.query.order_by(User.date_registered).first().date_registered
+    curr_day = datetime.utcnow()
+    days_difference = (curr_day - earliest_date_registered).days
+    labels=[]
+    values=[]
+    ymax=0
+    for i in range(min(past_day, days_difference + 2), 0, -1):
+        d1 = curr_day - timedelta(days=i)
+        d2=curr_day-timedelta(days=i-1)
+        post_count=len(Post.query.filter(Post.date_posted>=d1).filter(Post.date_posted<d2).all())
+        labels.append(d1.strftime('%Y/%m/%d'))
+        values.append(post_count)
+        ymax=max(ymax,post_count)
+    ymax*=1.5
+    return render_template('/admin/post_chart.html',page_header='Charts',labels=labels,values=values,form=form,ymax=ymax,day=past_day)
 
 @app.route('/post/new',methods=['GET','POST'])
 @login_required
@@ -238,11 +330,16 @@ def update_post(post_id):
 @login_required
 def delete_post(post_id):
     post=Post.query.get_or_404(post_id)
-    if post.author!=current_user:
+    if current_user.role.delete_post or current_user==post.author:
+        db.session.delete(post)
+        db.session.commit()
+        flash('Post Deleted!', 'success')
+        if current_user.role.delete_post:
+            return redirect(url_for('admin'))
+        else:
+            return redirect(url_for('home'))
+    else:
         abort(403)
-    db.session.delete(post)
-    db.session.commit()
-    flash('Post Deleted!','success')
     return redirect(url_for('home'))
 
 @app.route('/user/<string:username>')
@@ -291,8 +388,8 @@ def reset_token(token):
         return redirect(url_for('login'))
     return render_template('reset_token.html',title='Reset Password',form=form)
 
-@app.route('/resume')
-def resume():
-    return render_template('resume.html',title='Resume')
+# @app.route('/resume')
+# def resume():
+#     return render_template('resume.html',title='Resume')
 
 

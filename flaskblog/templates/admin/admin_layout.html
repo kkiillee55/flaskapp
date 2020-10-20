@@ -45,11 +45,11 @@
         <hr class="sidebar-divider my-0">
 
         <!-- Nav Item - Dashboard -->
-<!--        <li class="nav-item">-->
-<!--            <a class="nav-link" href="#">-->
-<!--                <i class="fas fa-fw fa-tachometer-alt"></i>-->
-<!--                <span>Dashboard</span></a>-->
-<!--        </li>-->
+        <li class="nav-item">
+            <a class="nav-link" href="{{url_for('admin')}}">
+                <i class="fas fa-fw fa-tachometer-area"></i>
+                <span>Dashboard</span></a>
+        </li>
 
         <!-- Divider -->
         <hr class="sidebar-divider">
@@ -126,9 +126,19 @@
 
         <!-- Nav Item - Charts -->
         <li class="nav-item">
-            <a class="nav-link" href="{{url_for('user_chart')}}">
+            <a class="nav-link collapsed" href="" data-toggle="collapse" data-target="#collapseCharts"
+            aria-expanded="true" aria-controls="collapseUtilities">
                 <i class="fas fa-fw fa-chart-area"></i>
-                <span>Charts</span></a>
+                <span>Charts</span>
+            </a>
+            <div id="collapseCharts" class="collapse" aria-labelledby="headingUtilities"
+                data-parent="#accordionSidebar">
+                <div class="bg-white py-2 collapse-inner rounded">
+                    <h6 class="collapse-header">Charts:</h6>
+                    <a class="collapse-item" href="{{url_for('user_chart')}}">User Data</a>
+                    <a class="collapse-item" href="{{url_for('post_chart')}}">Post Data</a>
+                </div>
+            </div>
         </li>
 
         <!-- Nav Item - Tables -->
@@ -142,9 +152,10 @@
                  data-parent="#accordionSidebar">
                 <div class="bg-white py-2 collapse-inner rounded">
                     <h6 class="collapse-header">Tables:</h6>
-                    <a class="collapse-item" href="{{url_for('user_table',role='normal_user')}}">User Table</a>
-                    <a class="collapse-item" href="{{url_for('user_table',role='admin')}}">Admin Table</a>
-                    <a class="collapse-item" href="{{url_for('user_table',role='super_admin')}}">Super Admin Table</a>
+                    <a class="collapse-item" href="{{url_for('user_table',role='normal_user',post='False')}}">User Table</a>
+                    <a class="collapse-item" href="{{url_for('user_table',role='admin',post='False')}}">Admin Table</a>
+                    <a class="collapse-item" href="{{url_for('user_table',role='super_admin',post='False')}}">Super Admin Table</a>
+                    <a class="collapse-item" href="{{url_for('user_table',role='normal_user',post='True')}}">Normal User Posts Table</a>
                 </div>
             </div>
         </li>
@@ -199,6 +210,10 @@
                                 <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
                                 Profile
                             </a>
+                            <a class="dropdown-item" href="{{url_for('home')}}">
+                                <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
+                                Blog Home
+                            </a>
                             <div class="dropdown-divider"></div>
                             <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
                                 <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
@@ -217,6 +232,23 @@
 
                 <!-- Page Heading -->
                 <!--          <h1 class="h3 mb-4 text-gray-800">Blank Page</h1>-->
+                  <div class="container">
+                    <div class="row">
+                      <div class="col-lg-8 col-md-10 mx-auto">
+                          <div class="col-md-8">
+                            {% with messages = get_flashed_messages(with_categories=True)  %}
+                                {% if messages %}
+                                    {% for category,message in messages %}
+                                        <div class="alert alert-{{ category }}">
+                                            {{ message }}
+                                        </div>
+                                    {% endfor %}
+                                {% endif %}
+                            {% endwith%}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 {%block body_content%}{%endblock body_content%}
 
             </div>
@@ -265,6 +297,7 @@
         </div>
     </div>
 </div>
+
 
 <!-- Bootstrap core JavaScript-->
 <script src="{{url_for('static',filename='vendor/jquery/jquery.min.js')}}"></script>

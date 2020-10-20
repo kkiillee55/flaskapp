@@ -10,7 +10,7 @@
     <div class="row">
         <div class="col-xl-8 col-lg-7 card shadow mb-4">
             <div class="card-header py-3">
-                <h6 class="m-0 font-weight-bold text-primary">User Activity Chart in past {{day}} days(1 new user = 10 pts, 1 post = 5pts, 1 comment = 1pts)</h6>
+                <h6 class="m-0 font-weight-bold text-primary">New Posts in past {{day}} days</h6>
             </div>
             <div class="card-body">
                 <div class="chart-bar">
@@ -89,7 +89,7 @@
           data: {
             labels: {{labels|safe}},
             datasets: [{
-              label: "Active_Pts",
+              label: "Posts",
               backgroundColor: "#4e73df",
               hoverBackgroundColor: "#2e59d9",
               borderColor: "#4e73df",
