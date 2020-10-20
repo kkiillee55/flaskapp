@@ -26,4 +26,5 @@ so there should be some cool graphs in admin page, i should check <a href="https
 and admin should be able to delete any post, comment and user.
 it shouldn't be very hard, 
 
+I finished the part above, today
 
